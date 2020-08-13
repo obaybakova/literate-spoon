@@ -1,97 +1,54 @@
----
 swagger: "2.0"
 info:
-  description: "This is a sample server Petstore server.  You can find out more about\
-    \ Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).\
-    \  For this sample, you can use the api key `special-key` to test the authorization\
-    \ filters."
-  version: "1.0.5"
-  title: "Swagger Petstore"
-  termsOfService: "http://swagger.io/terms/"
-  contact:
-    email: "apiteam@swagger.io"
-  license:
-    name: "Apache 2.0"
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "petstore.swagger.io"
-basePath: "/v2"
+  description: "This is a learning material for [Xsolla Summer School](https://school.xsolla.com/) program. Some <mark>requests</mark> are taken from the Petstore API documentation which can be found [here](https://petstore.swagger.io/). <br><br>Use this for practice and add your own paths and definitions. See the full task description in the [Google Doc](https://docs.google.com/document/d/1EDlrF0E0bgNc65ohrGCSoxJXhaNwWpcMiaMuRjfzOG4/edit?usp=sharing)."
+  version: "1.0.0"
+  title: "White your own methods"
+host: "summer.school.xsolla.com"
+basePath: "/api/v1"
 tags:
 - name: "pet"
   description: "Everything about your Pets"
   externalDocs:
     description: "Find out more"
     url: "http://swagger.io"
-- name: "store"
-  description: "Access to Petstore orders"
-- name: "user"
-  description: "Operations about user"
-  externalDocs:
-    description: "Find out more about our store"
-    url: "http://swagger.io"
+- name: "Xsolla"
+  description: "Request from Xsolla API"
+- name: "Stripe"
+  description: "Request from Stripe API"
 schemes:
 - "https"
-- "http"
 paths:
-  /pet/{petId}/uploadImage:
-    post:
-      tags:
-      - "pet"
-      summary: "uploads an image"
-      description: ""
-      operationId: "uploadFile"
-      consumes:
-      - "multipart/form-data"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "petId"
-        in: "path"
-        description: "ID of pet to update"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "additionalMetadata"
-        in: "formData"
-        description: "Additional data to pass to server"
-        required: false
-        type: "string"
-      - name: "file"
-        in: "formData"
-        description: "file to upload"
-        required: false
-        type: "file"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/ApiResponse"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /pet:
     post:
       tags:
       - "pet"
-      summary: "Add a new pet to the store"
-      description: ""
-      operationId: "addPet"
+      summary: "Add a New Pet"
+      description: "Adds a new pet to the store."
+      operationId: "add-a-new-pet"
       consumes:
       - "application/json"
-      - "application/xml"
       produces:
       - "application/json"
-      - "application/xml"
       parameters:
       - in: "body"
         name: "body"
-        description: "Pet object that needs to be added to the store"
+        description: "Pet object that needs to be added to the store."
         required: true
         schema:
-          $ref: "#/definitions/Pet"
+          $ref: "#/definitions/pet"
       responses:
-        405:
-          description: "Invalid input"
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/pet"
+        "400":
+          description: "(Bad Request) Invalid request parameters"
+          schema:
+            $ref: "#/definitions/api_error"
+          examples:
+            application/json:
+              code: "000-000"
+              description: "Your request has bad parameters."
       security:
       - petstore_auth:
         - "write:pets"
@@ -99,620 +56,306 @@ paths:
     put:
       tags:
       - "pet"
-      summary: "Update an existing pet"
-      description: ""
-      operationId: "updatePet"
+      summary: "Update an Pet"
+      description: "Update information about the existing pet."
+      operationId: "update-an-pet"
       consumes:
       - "application/json"
-      - "application/xml"
       produces:
       - "application/json"
-      - "application/xml"
       parameters:
       - in: "body"
         name: "body"
-        description: "Pet object that needs to be added to the store"
+        description: "Pet object that needs to be updated in the store."
         required: true
         schema:
-          $ref: "#/definitions/Pet"
+          $ref: "#/definitions/pet"
       responses:
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Pet not found"
-        405:
-          description: "Validation exception"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /pet/findByStatus:
-    get:
-      tags:
-      - "pet"
-      summary: "Finds Pets by status"
-      description: "Multiple status values can be provided with comma separated strings"
-      operationId: "findPetsByStatus"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "status"
-        in: "query"
-        description: "Status values that need to be considered for filter"
-        required: true
-        type: "array"
-        items:
-          type: "string"
-          enum:
-          - "available"
-          - "pending"
-          - "sold"
-          default: "available"
-        collectionFormat: "multi"
-      responses:
-        200:
-          description: "successful operation"
+        "200":
+          description: "OK"
           schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Pet"
-        400:
-          description: "Invalid status value"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /pet/findByTags:
-    get:
-      tags:
-      - "pet"
-      summary: "Finds Pets by tags"
-      description: "Multiple tags can be provided with comma separated strings. Use\
-        \ tag1, tag2, tag3 for testing."
-      operationId: "findPetsByTags"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "tags"
-        in: "query"
-        description: "Tags to filter by"
-        required: true
-        type: "array"
-        items:
-          type: "string"
-        collectionFormat: "multi"
-      responses:
-        200:
-          description: "successful operation"
+            $ref: "#/definitions/pet"
+        "400":
+          description: "(Bad Request) Invalid request parameters"
           schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Pet"
-        400:
-          description: "Invalid tag value"
+            $ref: "#/definitions/api_error"
+          examples:
+            application/json:
+              code: "000-000"
+              description: "Your request has bad parameters."
+        "404":
+          description: "(Not Found) Requested resource not found"
+          schema:
+            $ref: "#/definitions/api_error"
+          examples:
+            application/json:
+              code: "000-004"
+              description: "Pet not found."
       security:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
-      deprecated: true
-  /pet/{petId}:
+  /pet/{pet_id}:
     get:
       tags:
       - "pet"
-      summary: "Find pet by ID"
-      description: "Returns a single pet"
-      operationId: "getPetById"
+      summary: "Get Pet by ID"
+      description: "Gets the existing pet from the store by ID."
+      operationId: "get-pet-by-id"
       produces:
       - "application/json"
-      - "application/xml"
       parameters:
-      - name: "petId"
+      - name: "pet_id"
         in: "path"
-        description: "ID of pet to return"
+        description: "Pet ID."
         required: true
         type: "integer"
         format: "int64"
       responses:
-        200:
-          description: "successful operation"
+        "200":
+          description: "OK"
           schema:
-            $ref: "#/definitions/Pet"
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Pet not found"
+            $ref: "#/definitions/pet"
+        "404":
+          description: "(Not Found) Requested resource not found"
+          schema:
+            $ref: "#/definitions/api_error"
+          examples:
+            application/json:
+              code: "000-004"
+              description: "Pet not found."
+        "429":
+          description: "Validation exception"
+          schema:
+            $ref: "#/definitions/api_error"
+          examples:
+            application/json:
+              code: "000-029"
+              description: "Allowable number of requests exceeded."
       security:
       - api_key: []
-    post:
-      tags:
-      - "pet"
-      summary: "Updates a pet in the store with form data"
-      description: ""
-      operationId: "updatePetWithForm"
-      consumes:
-      - "application/x-www-form-urlencoded"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "petId"
-        in: "path"
-        description: "ID of pet that needs to be updated"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "name"
-        in: "formData"
-        description: "Updated name of the pet"
-        required: false
-        type: "string"
-      - name: "status"
-        in: "formData"
-        description: "Updated status of the pet"
-        required: false
-        type: "string"
-      responses:
-        405:
-          description: "Invalid input"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     delete:
       tags:
       - "pet"
-      summary: "Deletes a pet"
-      description: ""
-      operationId: "deletePet"
+      summary: "Delete a Pet"
+      description: "Deletes the pet by ID."
+      operationId: "delete-a-pet"
       produces:
       - "application/json"
-      - "application/xml"
       parameters:
       - name: "api_key"
         in: "header"
         required: false
         type: "string"
-      - name: "petId"
+      - name: "pet_id"
         in: "path"
-        description: "Pet id to delete"
+        description: "Pet ID."
         required: true
         type: "integer"
         format: "int64"
       responses:
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Pet not found"
+        "200":
+          description: "OK"
+        "404":
+          description: "(Not Found) Requested resource not found"
+          schema:
+            $ref: "#/definitions/api_error"
+          examples:
+            application/json:
+              code: "000-004"
+              description: "Pet not found."
       security:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
-  /store/order:
-    post:
-      tags:
-      - "store"
-      summary: "Place an order for a pet"
-      description: ""
-      operationId: "placeOrder"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "order placed for purchasing the pet"
-        required: true
-        schema:
-          $ref: "#/definitions/Order"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-        400:
-          description: "Invalid Order"
-  /store/order/{orderId}:
+  "/projects/{project_id}/users/{user_id}/payment_accounts":
     get:
       tags:
-      - "store"
-      summary: "Find purchase order by ID"
-      description: "For valid response try integer IDs with value >= 1 and <= 10.\
-        \ Other values will generated exceptions"
-      operationId: "getOrderById"
+      - "Xsolla" 
+      summary: "Get Saved Accounts"
+      description: "Lists saved payment accounts of a given user"
+      operationId: "get-saved-accounts"
       produces:
       - "application/json"
-      - "application/xml"
       parameters:
-      - name: "orderId"
+      - name: "project_id"
         in: "path"
-        description: "ID of pet that needs to be fetched"
+        description: "Project ID" 
         required: true
         type: "integer"
-        maximum: 10
-        minimum: 1
         format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Order not found"
-    delete:
-      tags:
-      - "store"
-      summary: "Delete purchase order by ID"
-      description: "For valid response try integer IDs with positive integer value.\
-        \ Negative or non-integer values will generate API errors"
-      operationId: "deleteOrder"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "orderId"
+      - name: "user_id"
         in: "path"
-        description: "ID of the order that needs to be deleted"
+        description: "User ID"
         required: true
         type: "integer"
-        minimum: 1
         format: "int64"
       responses:
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Order not found"
-  /store/inventory:
-    get:
-      tags:
-      - "store"
-      summary: "Returns pet inventories by status"
-      description: "Returns a map of status codes to quantities"
-      operationId: "getInventory"
-      produces:
-      - "application/json"
-      parameters: []
-      responses:
-        200:
-          description: "successful operation"
+        "200":
+          description: "OK"
           schema:
-            type: "object"
-            additionalProperties:
-              type: "integer"
-              format: "int32"
+            type: "array"
+            items: 
+              $ref: "#/definitions/account"
+        "404":
+          description: "Not Found"
       security:
       - api_key: []
-  /user/createWithArray:
+  /charges:
     post:
       tags:
-      - "user"
-      summary: "Creates list of users with given input array"
-      description: ""
-      operationId: "createUsersWithArrayInput"
+      - "Stripe"
+      summary: "Create a charge"
+      description: "To charge a credit card or other payment source, you create a Charge object. If your API key is in test mode, the supplied payment source (e.g., card) won’t actually be charged, although everything else will occur as if in live mode. (Stripe assumes that the charge would have completed successfully)."
+      operationId: "create-a-charge"
       consumes:
       - "application/json"
       produces:
       - "application/json"
-      - "application/xml"
       parameters:
-      - in: "body"
-        name: "body"
-        description: "List of user object"
-        required: true
+      - name: "body"
+        in: "body"
         schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/User"
-      responses:
-        default:
-          description: "successful operation"
-  /user/createWithList:
-    post:
-      tags:
-      - "user"
-      summary: "Creates list of users with given input array"
-      description: ""
-      operationId: "createUsersWithListInput"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "List of user object"
-        required: true
-        schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/User"
-      responses:
-        default:
-          description: "successful operation"
-  /user/{username}:
-    get:
-      tags:
-      - "user"
-      summary: "Get user by user name"
-      description: ""
-      operationId: "getUserByName"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be fetched. Use user1 for testing. "
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/User"
-        400:
-          description: "Invalid username supplied"
-        404:
-          description: "User not found"
-    put:
-      tags:
-      - "user"
-      summary: "Updated user"
-      description: "This can only be done by the logged in user."
-      operationId: "updateUser"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "name that need to be updated"
-        required: true
-        type: "string"
-      - in: "body"
-        name: "body"
-        description: "Updated user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
-      responses:
-        400:
-          description: "Invalid user supplied"
-        404:
-          description: "User not found"
-    delete:
-      tags:
-      - "user"
-      summary: "Delete user"
-      description: "This can only be done by the logged in user."
-      operationId: "deleteUser"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be deleted"
-        required: true
-        type: "string"
-      responses:
-        400:
-          description: "Invalid username supplied"
-        404:
-          description: "User not found"
-  /user/login:
-    get:
-      tags:
-      - "user"
-      summary: "Logs user into the system"
-      description: ""
-      operationId: "loginUser"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "query"
-        description: "The user name for login"
-        required: true
-        type: "string"
-      - name: "password"
-        in: "query"
-        description: "The password for login in clear text"
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          headers:
-            X-Expires-After:
+          type: object
+          required:
+            - "amount"
+            - "currency"
+          properties:
+            amount:
+              description: "Amount intended to be collected by this payment. A positive integer representing how much to charge in the smallest currency unit (e.g., 100 cents to charge $1.00 or 100 to charge ¥100, a zero-decimal currency). The minimum amount is $0.50 US or equivalent in charge currency. The amount value supports up to eight digits (e.g., a value of 99999999 for a USD charge of $999,999.99)"
+              type: "number"
+              format: "float"
+              example: 100
+            currency:
+              description: "Three-letter ISO currency code, in lowercase. Must be a supported currency"
               type: "string"
-              format: "date-time"
-              description: "date in UTC when token expires"
-            X-Rate-Limit:
-              type: "integer"
-              format: "int32"
-              description: "calls per hour allowed by the user"
+              example: "usd"
+            capture:
+              description: "Whether to immediately capture the charge. Defaults to true. When false, the charge issues an authorization (or pre-authorization), and will need to be captured later. Uncaptured charges expire in seven days. For more information, see the authorizing charges and settling later documentation"
+              type: "boolean"
+              default: true
+            receipt_email:
+              description: "The email address to which this charge’s receipt will be sent. The receipt will not be sent until the charge is paid, and no receipts will be sent for test mode charges. If this charge is for a Customer, the email address specified here will override the customer’s email address. If receipt_email is specified for a charge in live mode, a receipt will be sent regardless of your email settings"
+              type: "string"
+              example: "my@email.com"
+      responses:
+        "200":
+          description: "OK"
           schema:
-            type: "string"
-        400:
-          description: "Invalid username/password supplied"
-  /user/logout:
-    get:
-      tags:
-      - "user"
-      summary: "Logs out current logged in user session"
-      description: ""
-      operationId: "logoutUser"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters: []
-      responses:
-        default:
-          description: "successful operation"
-  /user:
-    post:
-      tags:
-      - "user"
-      summary: "Create user"
-      description: "This can only be done by the logged in user."
-      operationId: "createUser"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Created user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
-      responses:
-        default:
-          description: "successful operation"
+            $ref: "#/definitions/charge"
+      security:
+      - api_key: []
 securityDefinitions:
+  petstore_auth:
+    type: "oauth2"
+    authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      write:pets: "modify pets in your account"
+      read:pets: "read your pets"
   api_key:
     type: "apiKey"
     name: "api_key"
     in: "header"
-  petstore_auth:
-    type: "oauth2"
-    authorizationUrl: "https://petstore.swagger.io/oauth/authorize"
-    flow: "implicit"
-    scopes:
-      read:pets: "read your pets"
-      write:pets: "modify pets in your account"
 definitions:
-  ApiResponse:
+  account:
     type: "object"
     properties:
-      code:
+      id:
         type: "integer"
-        format: "int32"
+        format: "int64"
+        example: 4612345
+      name:
+        type: "string"
+        example: "PP_saved_account"
+      payment_system:
+        type: "object"
+        properties:
+          id:
+            type: "integer"
+            format: "int64"
+            example: "24"
+          name:
+            type: "string"
+            example: "PayPal"
       type:
         type: "string"
-      message:
+        example: "paypal"
+  charge:
+    type: "object"
+    properties:
+      id:
         type: "string"
-  Category:
+        example: "ch_1HFWCi2eZvKYlo2CKud5k7FU"
+      amount:
+        type: "number"
+        format: "float"
+        example: "2000"
+      billing_details:
+        type: "object"
+        properties:
+          address:
+            type: "object"
+            properties:
+              city:
+                type: "string"
+                example: "Perm"
+              country:
+                type: "string"
+                example: "Russia"
+      description:
+        type: "string"
+        example: "My First Test Charge (created for API docs)"
+      paid:
+        type: "boolean"
+        example: true
+  dog_breed:
     type: "object"
     properties:
       id:
         type: "integer"
         format: "int64"
+        description: "Dog's breed ID in the store."
       name:
         type: "string"
-    xml:
-      name: "Category"
-  Pet:
+        description: "Name of the dog's breed."
+        example: 123
+  pet:
     type: "object"
     required:
+    - "id"
     - "name"
-    - "photoUrls"
+    - "dog_breed"
     properties:
       id:
         type: "integer"
         format: "int64"
-      category:
-        $ref: "#/definitions/Category"
+        description: "Pet ID in the store."
+        example: 123
       name:
         type: "string"
-        example: "doggie"
-      photoUrls:
-        type: "array"
-        xml:
-          wrapped: true
-        items:
-          type: "string"
-          xml:
-            name: "photoUrl"
-      tags:
-        type: "array"
-        xml:
-          wrapped: true
-        items:
-          xml:
-            name: "tag"
-          $ref: "#/definitions/Tag"
+        description: "Pet name."
+        example: "Bobik"
+      dog_breed:
+        $ref: "#/definitions/dog_breed"
       status:
         type: "string"
-        description: "pet status in the store"
+        description: "Pet status in the store."
         enum:
         - "available"
         - "pending"
         - "sold"
-    xml:
-      name: "Pet"
-  Tag:
+        example: "available"
+  api_error:
     type: "object"
+    description: "Error"
+    required:
+      - "code"
+      - "description"
     properties:
-      id:
-        type: "integer"
-        format: "int64"
-      name:
+      code:
+        description: "Error code."
         type: "string"
-    xml:
-      name: "Tag"
-  Order:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      petId:
-        type: "integer"
-        format: "int64"
-      quantity:
-        type: "integer"
-        format: "int32"
-      shipDate:
+      description:
+        description: "Error description."
         type: "string"
-        format: "date-time"
-      status:
-        type: "string"
-        description: "Order Status"
-        enum:
-        - "placed"
-        - "approved"
-        - "delivered"
-      complete:
-        type: "boolean"
-    xml:
-      name: "Order"
-  User:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      username:
-        type: "string"
-      firstName:
-        type: "string"
-      lastName:
-        type: "string"
-      email:
-        type: "string"
-      password:
-        type: "string"
-      phone:
-        type: "string"
-      userStatus:
-        type: "integer"
-        format: "int32"
-        description: "User Status"
-    xml:
-      name: "User"
-externalDocs:
-  description: "Find out more about Swagger"
-  url: "http://swagger.io"
