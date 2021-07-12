@@ -24,7 +24,7 @@ paths:
       - "pet"
       summary: "Add a New Pet"
       description: "Adds a new pet to the store."
-      operationId: "add-a-new-pet"
+      operationId: "add-new-pet"
       consumes:
       - "application/json"
       produces:
@@ -58,7 +58,7 @@ paths:
       - "pet"
       summary: "Update an Pet"
       description: "Update information about the existing pet."
-      operationId: "update-an-pet"
+      operationId: "update-pet"
       consumes:
       - "application/json"
       produces:
@@ -101,7 +101,7 @@ paths:
       - "pet"
       summary: "Get Pet by ID"
       description: "Gets the existing pet from the store by ID."
-      operationId: "get-pet-by-id"
+      operationId: "get-pet-id"
       produces:
       - "application/json"
       parameters:
@@ -139,7 +139,7 @@ paths:
       - "pet"
       summary: "Delete a Pet"
       description: "Deletes the pet by ID."
-      operationId: "delete-a-pet"
+      operationId: "delete-pet"
       produces:
       - "application/json"
       parameters:
@@ -207,7 +207,7 @@ paths:
       - "Stripe"
       summary: "Create a charge"
       description: "To charge a credit card or other payment source, you create a Charge object. If your API key is in test mode, the supplied payment source (e.g., card) won’t actually be charged, although everything else will occur as if in live mode. (Stripe assumes that the charge would have completed successfully)."
-      operationId: "create-a-charge"
+      operationId: "create-charge"
       consumes:
       - "application/json"
       produces:
