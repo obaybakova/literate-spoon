@@ -1011,7 +1011,7 @@ paths:
       - basicAuth: []
       summary: 列示所有报告
       tags:
-      - Reports
+      - 报告
   /merchants/{merchant_id}/reports/transactions/registry.{format}:
     get:
       description: |-
@@ -1149,7 +1149,7 @@ paths:
       - basicAuth: []
       summary: 列示所有操作
       tags:
-      - Reports
+      - 报告
   /merchants/{merchant_id}/reports/transactions/search.{format}:
     get:
       description: 基于特定搜索参数获取交易列表。将在API的响应中返回JSON、CSV或XLS。
@@ -1225,7 +1225,7 @@ paths:
       - basicAuth: []
       summary: 搜索所有交易
       tags:
-      - Reports
+      - 报告
   /merchants/{merchant_id}/reports/transactions/summary/transfer:
     get:
       description: |-
@@ -1279,7 +1279,7 @@ paths:
       - basicAuth: []
       summary: 列示所有汇款
       tags:
-      - Reports
+      - 报告
   /merchants/{merchant_id}/reports/transactions/{transaction_id}/details:
     get:
       description: 按ID获取完整交易信息。
@@ -1390,7 +1390,7 @@ paths:
       - basicAuth: []
       summary: 获取交易
       tags:
-      - Reports
+      - 报告
   /merchants/{merchant_id}/reports/transactions/{transaction_id}/partial_refund:
     put:
       description: 发送部分退款请求向用户退还部分付款。请注意，部分退款仅适用于使用信用卡和PayPal付款。要了解详细过程，请参阅[退款功能](https://developers.xsolla.com/doc/pay-station/features/refund/)。
@@ -1477,7 +1477,7 @@ paths:
       - basicAuth: []
       summary: 部分退款
       tags:
-      - Refund
+      - 退款
   /merchants/{merchant_id}/reports/transactions/{transaction_id}/refund:
     put:
       description: |-
@@ -1564,7 +1564,7 @@ paths:
       - basicAuth: []
       summary: 请求退款
       tags:
-      - Refund
+      - 退款
   /merchants/{merchant_id}/token:
     post:
       description: |-
@@ -1672,7 +1672,7 @@ paths:
       - basicAuth: []
       summary: 创建令牌
       tags:
-      - Token
+      - 令牌
   /projects/{project_id}/users/{user_id}/payment_accounts:
     get:
       description: 列示已保存的用户支付帐户。
@@ -1696,7 +1696,7 @@ paths:
       - basicAuth: []
       summary: 列示已保存的支付帐户
       tags:
-      - Tokenization
+      - 标记化
   /projects/{project_id}/users/{user_id}/payment_accounts/{type}/{account_id}:
     delete:
       description: 删除已保存的支付帐户。
@@ -1713,7 +1713,7 @@ paths:
       - basicAuth: []
       summary: 删除已保存的支付帐户
       tags:
-      - Tokenization
+      - 标记化
   /projects/{project_id}/users/{user_id}/payments/{type}/{account_id}:
     post:
       description: |-
@@ -1780,16 +1780,16 @@ paths:
       - basicAuth: []
       summary: 通过已保存的帐户收费
       tags:
-      - Tokenization
+      - 标记化
 servers:
 - url: https://api.xsolla.com/merchant/v2/
 tags:
 - description: 为使支付更加安全，艾克索拉API使用包含一系列支付参数的令牌，而不是通过HTTP GET请求直接在支付页面上接收数据。在调用支付页面之前，您应获取新的令牌。令牌的生命周期为24小时。
-  name: Token
+  name: 令牌
 - description: 要了解为应用设置令牌化的详细信息，请参阅[支付中心文档](https://developers.xsolla.com/doc/pay-station/features/tokenization/)。
-  name: Tokenization
-- name: Reports
-- name: Refund
+  name: 标记化
+- name: 报告
+- name: 退款
 x-stoplight:
   docs:
     showModels: false
