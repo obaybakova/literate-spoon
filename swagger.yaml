@@ -1014,7 +1014,7 @@ paths:
       - 报告
   /merchants/{merchant_id}/reports/transactions/registry.{format}:
     get:
-      description: 以不同数据格式获取指定数据范围/传输/报告的所有交易的信息。将在API的响应中返回JSON、CSV或XLS。<style>.alert_notice {padding: 20px;background-color: #d66864;color: white;}</style><div class='alert_notice'><strong>Notice:</strong> Add one pet at a time.</div><br><br>此API方法在高负载状态下不可用。请求数量过多的情况下可能会限流。如需了解此API方法的流量控制详情，请联系您的帐户经理。</div>
+      description: "以不同数据格式获取指定数据范围/传输/报告的所有交易的信息。将在API的响应中返回JSON、CSV或XLS。<style>.alert_notice {padding: 20px;background-color: #d66864;color: white;}</style><div class='alert_notice'><strong>Notice:</strong> Add one pet at a time.</div><br><br>此API方法在高负载状态下不可用。请求数量过多的情况下可能会限流。如需了解此API方法的流量控制详情，请联系您的帐户经理。</div>"
       operationId: get-transactions
       parameters:
       - $ref: '#/components/parameters/merchant-id-path-param'
