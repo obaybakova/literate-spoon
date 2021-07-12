@@ -1,361 +1,1795 @@
-swagger: "2.0"
-info:
-  description: "This is a learning material for [Xsolla Summer School](https://school.xsolla.com/) program. Some <mark>requests</mark> are taken from the Petstore API documentation which can be found [here](https://petstore.swagger.io/). <br><br>Use this for practice and add your own paths and definitions. See the full task description in the [Google Doc](https://docs.google.com/document/d/1EDlrF0E0bgNc65ohrGCSoxJXhaNwWpcMiaMuRjfzOG4/edit?usp=sharing)."
-  version: "1.0.0"
-  title: "White your own methods"
-host: "summer.school.xsolla.com"
-basePath: "/api/v1"
-tags:
-- name: "pet"
-  description: "Everything about your Pets"
-  externalDocs:
-    description: "Find out more"
-    url: "http://swagger.io"
-- name: "Xsolla"
-  description: "Request from Xsolla API"
-- name: "Stripe"
-  description: "Request from Stripe API"
-schemes:
-- "https"
-paths:
-  /pet:
-    post:
-      tags:
-      - "pet"
-      summary: "Add a New Pet"
-      description: "Adds a new pet to the store."
-      operationId: "add-new-pet"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Pet object that needs to be added to the store."
-        required: true
-        schema:
-          $ref: "#/definitions/pet"
-      responses:
-        "200":
-          description: "OK"
-          schema:
-            $ref: "#/definitions/pet"
-        "400":
-          description: "(Bad Request) Invalid request parameters"
-          schema:
-            $ref: "#/definitions/api_error"
-          examples:
-            application/json:
-              code: "000-000"
-              description: "Your request has bad parameters."
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-    put:
-      tags:
-      - "pet"
-      summary: "Update an Pet"
-      description: "Update information about the existing pet."
-      operationId: "update-pet"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Pet object that needs to be updated in the store."
-        required: true
-        schema:
-          $ref: "#/definitions/pet"
-      responses:
-        "200":
-          description: "OK"
-          schema:
-            $ref: "#/definitions/pet"
-        "400":
-          description: "(Bad Request) Invalid request parameters"
-          schema:
-            $ref: "#/definitions/api_error"
-          examples:
-            application/json:
-              code: "000-000"
-              description: "Your request has bad parameters."
-        "404":
-          description: "(Not Found) Requested resource not found"
-          schema:
-            $ref: "#/definitions/api_error"
-          examples:
-            application/json:
-              code: "000-004"
-              description: "Pet not found."
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /pet/{pet_id}:
-    get:
-      tags:
-      - "pet"
-      summary: "Get Pet by ID"
-      description: "Gets the existing pet from the store by ID."
-      operationId: "get-pet-id"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "pet_id"
-        in: "path"
-        description: "Pet ID."
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          schema:
-            $ref: "#/definitions/pet"
-        "404":
-          description: "(Not Found) Requested resource not found"
-          schema:
-            $ref: "#/definitions/api_error"
-          examples:
-            application/json:
-              code: "000-004"
-              description: "Pet not found."
-        "429":
-          description: "Validation exception"
-          schema:
-            $ref: "#/definitions/api_error"
-          examples:
-            application/json:
-              code: "000-029"
-              description: "Allowable number of requests exceeded."
-      security:
-      - api_key: []
-    delete:
-      tags:
-      - "pet"
-      summary: "Delete a Pet"
-      description: "Deletes the pet by ID."
-      operationId: "delete-pet"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "api_key"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "pet_id"
-        in: "path"
-        description: "Pet ID."
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        "200":
-          description: "OK"
-        "404":
-          description: "(Not Found) Requested resource not found"
-          schema:
-            $ref: "#/definitions/api_error"
-          examples:
-            application/json:
-              code: "000-004"
-              description: "Pet not found."
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  "/projects/{project_id}/users/{user_id}/payment_accounts":
-    get:
-      tags:
-      - "Xsolla" 
-      summary: "Get Saved Accounts"
-      description: "Lists saved payment accounts of a given user"
-      operationId: "get-saved-accounts"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "project_id"
-        in: "path"
-        description: "Project ID" 
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "user_id"
-        in: "path"
-        description: "User ID"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          schema:
-            type: "array"
-            items: 
-              $ref: "#/definitions/account"
-        "404":
-          description: "Not Found"
-      security:
-      - api_key: []
-  /charges:
-    post:
-      tags:
-      - "Stripe"
-      summary: "Create a charge"
-      description: "To charge a credit card or other payment source, you create a Charge object. If your API key is in test mode, the supplied payment source (e.g., card) won’t actually be charged, although everything else will occur as if in live mode. (Stripe assumes that the charge would have completed successfully)."
-      operationId: "create-charge"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "body"
-        in: "body"
-        schema:
+components:
+  parameters:
+    account-id-path-param:
+      description: 艾克索拉数据库中已保存的帐户的ID。
+      in: path
+      name: account_id
+      required: true
+      schema:
+        type: integer
+    datetime-from:
+      description: 日期范围的开始时间。
+      in: query
+      name: datetime_from
+      required: false
+      schema:
+        format: datetime
+        type: string
+    datetime-from-req:
+      description: 日期范围的开始时间。
+      in: query
+      name: datetime_from
+      required: true
+      schema:
+        format: datetime
+        type: string
+    datetime-to:
+      description: 日期范围的结束时间。
+      in: query
+      name: datetime_to
+      required: false
+      schema:
+        format: datetime
+        type: string
+    datetime-to-req:
+      description: 日期范围的结束时间。
+      in: query
+      name: datetime_to
+      required: true
+      schema:
+        format: datetime
+        type: string
+    email:
+      description: 用户电子邮件。
+      in: query
+      name: email
+      required: false
+      schema:
+        type: string
+    external-id:
+      description: 交易外部ID。
+      in: query
+      name: external_id
+      required: false
+      schema:
+        type: string
+    format:
+      description: |-
+        数据格式：
+        - json
+        - csv
+        - xls
+      in: path
+      name: format
+      required: true
+      schema:
+        enum:
+        - json
+        - csv
+        - xls
+        type: string
+    in-transfer-currency:
+      description: 是否用支出币种（默认为支付币种）显示所有财务数据。
+      in: query
+      name: in_transfer_currency
+      required: true
+      schema:
+        type: integer
+    legal-entity-id:
+      description: 开发者法律实体ID。
+      in: query
+      name: legal_entity_id
+      required: false
+      schema:
+        type: integer
+    limit:
+      description: 页面上元素数量的限制。
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+    merchant-id-path-param:
+      description: 商户ID。
+      in: path
+      name: merchant_id
+      required: true
+      schema:
+        type: integer
+    merchant-of-records:
+      description: 在册商户。可以是`xsolla`、`merchant`或不指定。如果为`merchant`，则返回通过合作伙伴直接帐户进行的交易。如果为`xsolla`，则返回非通过合作伙伴直接帐户进行的交易。如未指定，则返回所有交易。
+      in: query
+      name: merchant_of_records
+      required: false
+      schema:
+        enum:
+        - xsolla
+        - merchant
+        type: string
+    offset:
+      description: 元素编号，从该元素开始生成列表（从0开始数）。
+      in: query
+      name: offset
+      required: false
+      schema:
+        type: integer
+    phone:
+      description: 用户电话号码（采用国际格式）。
+      in: query
+      name: phone
+      required: false
+      schema:
+        type: string
+    project-id-path-param:
+      description: 项目ID。
+      in: path
+      name: project_id
+      required: true
+      schema:
+        type: integer
+    project-id-query-param:
+      description: 项目ID。
+      in: query
+      name: project_id
+      required: false
+      schema:
+        type: integer
+    report-id:
+      description: 财务报告 ID。
+      in: query
+      name: report_id
+      required: false
+      schema:
+        type: integer
+    show-dry-run:
+      description: 是否包括测试交易。
+      in: query
+      name: show_dry_run
+      required: false
+      schema:
+        type: boolean
+    show-total:
+      description: 是否在文件结尾添加总计值行。
+      in: query
+      name: show_total
+      required: true
+      schema:
+        type: boolean
+    status:
+      description: 其他交易状态：`created`, `processing`, `done`, `canceled`, `error`, `review`,
+        `refunded`, `awaitingRefund`。
+      in: query
+      name: status
+      required: false
+      schema:
+        enum:
+        - created
+        - processing
+        - done
+        - canceled
+        - error
+        - review
+        - refunded
+        - awaitingRefund
+        type: string
+    transaction-id:
+      description: 交易ID。
+      in: query
+      name: transaction_id
+      required: false
+      schema:
+        type: integer
+    transaction-id-path-param:
+      description: 交易ID。
+      in: path
+      name: transaction_id
+      required: true
+      schema:
+        type: integer
+    transaction-status:
+      description: 交易状态。可以是`done`、`canceled`或`error`。
+      in: query
+      name: status
+      required: false
+      schema:
+        enum:
+        - done
+        - canceled
+        - error
+        type: string
+    transaction-type:
+      description: 操作的类型，可以是`payment`、`coupon`、`inGamePurchase`、`internal`或`cancellation`。
+      in: query
+      name: transaction_type
+      required: false
+      schema:
+        enum:
+        - payment
+        - coupon
+        - inGamePurchase
+        - internal
+        - cancellation
+        type: string
+    transfer-id:
+      description: 交易传输 ID。
+      in: query
+      name: transfer_id
+      required: false
+      schema:
+        type: integer
+    type-path-param:
+      description: |-
+        支付帐户类型。可能值：
+        - `card` — 银行卡；
+        - `amazon` — Amazon Pay；
+        - `skrill` — Skrill数字钱包；
+        - `yandex` — Yandex.Money；
+        - `paymasterwebmoney` — WebMoney；
+        - `paypal` — PayPal；
+        - `qiwi` — QIWI Wallet。
+
+        如果收到HTTP 422错误状态代码，则请求返回一个错误代码及详细错误描述。
+      in: path
+      name: type
+      required: true
+      schema:
+        enum:
+        - card
+        - amazon
+        - skrill
+        - yandex
+        - paymasterwebmoney
+        - paypal
+        - qiwi
+        type: string
+    user-custom:
+      description: 用户标识的自定义参数。
+      in: query
+      name: user_custom
+      required: false
+      schema:
+        type: string
+    user-id-path-param:
+      description: 用户ID。
+      in: path
+      name: user_id
+      required: true
+      schema:
+        type: string
+    user-id-query-param:
+      description: 用户ID。
+      in: query
+      name: user_id
+      required: false
+      schema:
+        type: string
+    user-name:
+      description: 用户名。
+      in: query
+      name: user_name
+      required: false
+      schema:
+        type: string
+  schemas:
+    CustomParameters:
+      description: 您可以在令牌的`custom_parameters`对象中传递其他参数以配置反欺诈筛选器。推荐参数在下拉列表中显示。[请参阅支付中心文档](https://developers.xsolla.com/doc/pay-station/features/antifraud/)。
+      properties:
+        active_date:
+          description: 上一次出现日期（按照[ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)格式）。
+          type: string
+        additional_verification:
+          description: 玩家是否使用了帐户验证流程。
+          type: boolean
+        character_customized:
+          description: 玩家是否对角色进行了自定义。
+          type: boolean
+        chat_activity:
+          description: 玩家是否使用了聊天功能。
+          type: boolean
+        completed_tasks:
+          description: 完成的任务/目标数。
+          type: integer
+        forum_activity:
+          description: 玩家是否使用了论坛功能。
+          type: boolean
+        items_used:
+          description: 玩家是否使用了购买的游戏装备。
+          type: boolean
+        karma_points:
+          description: 玩家的贡献/业力。
+          type: integer
+        last_change_password_date:
+          description: 上一次出现日期（按照[ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)格式）。
+          type: string
+        non_premium_currency:
+          description: 非高级货币数量。
+          format: float
+          type: integer
+        notifications_enabled:
+          description: 玩家是否启用了通知。
+          type: boolean
+        profile_completed:
+          description: 玩家在帐户资料中是否添加了其它信息。
+          type: boolean
+        profile_image_added:
+          description: 玩家是否上传了简介头像。
+          type: boolean
+        pvp_activity:
+          description: 玩家是否参与了玩家对战。
+          type: boolean
+        registration_date:
+          description: 上一次出现日期（按照[ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)格式）。
+          type: string
+        session_time:
+          description: 上一次出现日期（按照[ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)格式）。
+          type: string
+        social_networks_added:
+          description: 玩家是否有关联的社交媒体帐户资料。
+          type: boolean
+        total_bans:
+          description: 玩家在聊天/论坛中被禁言的次数。
+          type: integer
+        total_characters:
+          description: 游戏角色数。
+          type: integer
+        total_clans:
+          description: 玩家所属的家族数。
+          type: integer
+        total_friends:
+          description: 好友数。
+          type: integer
+        total_game_events:
+          description: 玩家参与的游戏事件数。
+          type: integer
+        total_gifts:
+          description: 玩家发出/收到的游戏礼物数。
+          type: integer
+        total_hours:
+          description: 游戏总时数。
+          type: integer
+        total_inventory_value:
+          description: 库存总值（以游戏货币为单位）。
+          format: float
+          type: integer
+        total_sum:
+          description: 付款总额。
+          format: float
+          type: integer
+        tutorial_completed:
+          description: 玩家是否完成了游戏教程。
+          type: boolean
+        unlocked_achievements:
+          description: 未解锁的通关数。
+          type: integer
+        user_level:
+          description: 玩家的等级、口碑或排名。
+          type: integer
+        win_rate:
+          description: 赢率。
+          type: integer
+      type: object
+    Purchase:
+      description: 带有购买相关数据的对象。
+      properties:
+        coupon_code:
+          description: 关于购买时的折扣促销码或奖励的信息（对象）。
+          properties:
+            hidden:
+              description: 在支付UI中隐藏输入促销码的字段。默认为`false`。
+              type: boolean
+            value:
+              description: 促销码值。
+              type: string
           type: object
-          required:
-            - "amount"
-            - "currency"
+        gift:
+          description: 礼物详情（对象）。
+          properties:
+            friends:
+              description: 包含好友数据的数组。
+              items:
+                properties:
+                  email:
+                    description: 收礼人邮箱。
+                    type: string
+                  id:
+                    description: 收礼人ID。
+                    type: string
+                  name:
+                    description: 收礼人昵称。
+                    type: string
+                type: object
+              type: array
+            giver_id:
+              description: 送礼人ID。
+              type: string
+            hide_giver_from_receiver:
+              description: 是否对收礼人隐藏送礼人的身份信息。默认值为`true`。
+              type: string
+            message:
+              description: 送礼人留言。
+              type: string
+          type: object
+        pin_codes:
+          description: 游戏密钥。
+          properties:
+            codes:
+              description: 游戏密钥。
+              items:
+                properties:
+                  digital_content:
+                    description: 在发布商帐户中设置的游戏SKU。
+                    type: string
+                  drm:
+                    description: 用于分发游戏的DRM平台。可以是`steam`、`playstation`、`xbox`、`uplay`、`origin`、`drmfree`、`gog`、`epicgames`、`nintendo_eshop`、`discord_game_store`或`oculus`。请确保您已在发布商帐户中配置了所需的DRM平台。如果未在令牌中传递此参数，则用户可以在支付UI中选择平台。
+                    enum:
+                    - steam
+                    - playstation
+                    - xbox
+                    - uplay
+                    - origin
+                    - drmfree
+                    - gog
+                    - epicgames
+                    - nintendo_eshop
+                    - discord_game_store
+                    - oculus
+                    type: string
+                type: object
+              type: array
+            currency:
+              description: 购买游戏密钥的币种，以此币种进行所有计算。
+              type: string
+            upgrade:
+              description: 包含升级数据的对象。
+              properties:
+                id:
+                  description: 升级ID。
+                  type: integer
+                id_user_history:
+                  description: 包含关于用户及其套餐数据的条目ID。
+                  type: integer
+              type: object
+          type: object
+        subscription:
+          description: 带有订阅相关数据的对象。
+          properties:
+            available_plans:
+              description: 包含订阅套餐相关数据的数组。只有这些套餐会显示在支付用户界面中。
+              items:
+                type: string
+              type: array
+            currency:
+              description: 购买计划的货币，以此币种进行所有计算。
+              type: string
+            operation:
+              description: 此操作的类型应用于用户订阅计划。要更改订阅计划，请传入`change_plan`值。需在`purchase.subscription.plan_id`参数中指定新计划的ID。
+              type: string
+            plan_id:
+              description: 计划 ID。
+              type: string
+            product_id:
+              description: 产品ID。
+              type: string
+            trial_days:
+              description: 试用期，以天为单位。
+              type: integer
+          type: object
+        virtual_currency:
+          description: 带有虚拟货币相关数据的对象。
+          properties:
+            currency:
+              description: 虚拟货币套餐的币种，以此币种进行所有计算。
+              type: string
+            quantity:
+              description: 使用虚拟货币购买的数量。
+              format: float
+              type: integer
+          type: object
+        virtual_items:
+          description: 带有购买的虚拟物品相关数据的对象。
+          properties:
+            currency:
+              description: 购买中虚拟物品的币种，以此币种进行所有计算。
+              type: string
+            items:
+              items:
+                description: 带有购买的物品相关数据的数组。
+                properties:
+                  amount:
+                    description: 物品数量。
+                    type: integer
+                  available_groups:
+                    description: 带有物品组 ID 的数组。支付 UI 中将仅显示指定组的物品。
+                    items:
+                      type: string
+                    type: array
+                  sku:
+                    description: 物品 ID。
+                    type: string
+                type: object
+              type: array
+          type: object
+      type: object
+    Purchase_body:
+      description: 带有购买相关数据的对象。
+      properties:
+        checkout:
+          description: 带有结账参数相关数据的对象。
           properties:
             amount:
-              description: "Amount intended to be collected by this payment. A positive integer representing how much to charge in the smallest currency unit (e.g., 100 cents to charge $1.00 or 100 to charge ¥100, a zero-decimal currency). The minimum amount is $0.50 US or equivalent in charge currency. The amount value supports up to eight digits (e.g., a value of 99999999 for a USD charge of $999,999.99)"
-              type: "number"
-              format: "float"
-              example: 100
+              description: 购买金额。
+              format: float
+              type: integer
             currency:
-              description: "Three-letter ISO currency code, in lowercase. Must be a supported currency"
-              type: "string"
-              example: "usd"
-            capture:
-              description: "Whether to immediately capture the charge. Defaults to true. When false, the charge issues an authorization (or pre-authorization), and will need to be captured later. Uncaptured charges expire in seven days. For more information, see the authorizing charges and settling later documentation"
-              type: "boolean"
-              default: true
-            receipt_email:
-              description: "The email address to which this charge’s receipt will be sent. The receipt will not be sent until the charge is paid, and no receipts will be sent for test mode charges. If this charge is for a Customer, the email address specified here will override the customer’s email address. If receipt_email is specified for a charge in live mode, a receipt will be sent regardless of your email settings"
-              type: "string"
-              example: "my@email.com"
+              description: 购买币种。参照[ISO 4217](https://en.wikipedia.org/wiki/ISO_4217)标准的三字母货币代码。
+              type: string
+          type: object
+        virtual_currency:
+          description: 带有虚拟货币相关数据的对象。
+          properties:
+            quantity:
+              description: 使用虚拟货币购买的数量。
+              format: float
+              type: integer
+          type: object
+      type: object
+    Settings:
+      description: 带有自定义项目设置的对象。
+      properties:
+        currency:
+          description: 首选支付币种。参照[ISO 4217](https://en.wikipedia.org/wiki/ISO_4217)标准的三字母货币代码。
+          type: string
+        external_id:
+          description: 交易的外部 ID。
+          type: string
+        language:
+          description: 界面语言。2字母（小写字母）[语言代码](https://developers.xsolla.com/doc/pay-station/features/localization/)。
+          type: string
+        mode:
+          description: 设置为`sandbox`值以测试支付流程。请使用*https://sandbox-secure.xsolla.com*来访问测试支付UI。
+          type: string
+        payment_method:
+          description: 付款方式ID。
+          type: integer
+        payment_widget:
+          description: 支付小部件。可以是 `paybycash` 或 `giftcard`。如果参数已设置，用户将分别重定向到 Pay by
+            Cash 或 Gift Cards 小部件。
+          enum:
+          - paybycash
+          - giftcard
+          type: string
+        project_id:
+          description: 游戏的艾克索拉ID。可以在发布商帐户中找到该ID。
+          type: integer
+        redirect_policy:
+          description: 重定向政策设置（对象）。
+          properties:
+            delay:
+              description: 延迟时间（单位为秒），经过该时间后用户将自动重定向至返回URL。
+              type: integer
+            manual_redirection_action:
+              description: 由用户点击关闭按钮或**返回游戏**按钮触发的支付中心行为。可以是`redirect`（默认）或`postmessage`。如果设置为`redirect`，则用户将被重定向至令牌中传入的URL或发布商帐户中指定的URL。如果设置为`postmessage`，则用户留在原页面。点击关闭按钮发起发送`close`事件，点击**返回游戏**则发起发送`return`事件。
+              enum:
+              - redirect
+              - postmessage
+              type: string
+            redirect_button_caption:
+              description: 手动重定向按钮上的文字。
+              type: string
+            redirect_conditions:
+              description: 将用户重定向至返回URL的支付状态。可以是`none`, `successful`, `successful_or_canсeled`或`any`。
+              enum:
+              - none
+              - successful
+              - successful_or_canceled
+              - any
+              type: string
+            status_for_manual_redirection:
+              description: 显示让用户重定向至返回URL按钮的支付状态。可以是`none`, `successful`, `successful_or_canсeled`或`any`。
+              enum:
+              - none
+              - successful
+              - successful_or_canceled
+              - any
+              type: string
+          type: object
+        return_url:
+          description: 用户会在支付过后被重定向到此页面。参数`user_id`、`foreigninvoice`、`invoice_id`和`status`会被自动添加到此链接。
+          type: string
+        ui:
+          description: 带有界面设置相关数据的对象。
+          properties:
+            components:
+              description: 带有模块菜单设置相关数据的对象。
+              properties:
+                subscriptions:
+                  description: 带有订阅模块设置相关数据的对象。
+                  properties:
+                    hidden:
+                      description: 在菜单中显示还是隐藏“管理订阅”页面。
+                      type: boolean
+                    order:
+                      description: 虚拟物品在模块菜单中的排列顺序。
+                      type: integer
+                  type: object
+                virtual_currency:
+                  description: 带有虚拟货币模块设置相关数据的对象。
+                  properties:
+                    custom_amount:
+                      description: 是否允许在支付UI中输入任意数量的虚拟货币。
+                      type: boolean
+                    hidden:
+                      description: 在菜单中显示还是隐藏“管理订阅”页面。
+                      type: boolean
+                    order:
+                      description: 虚拟物品在模块菜单中的排列顺序。
+                      type: integer
+                  type: object
+                virtual_items:
+                  description: 带有虚拟物品模块设置相关数据的对象。
+                  properties:
+                    hidden:
+                      description: 在菜单中显示还是隐藏“管理订阅”页面。
+                      type: boolean
+                    order:
+                      description: 虚拟物品在模块菜单中的排列顺序。
+                      type: integer
+                    selected_group:
+                      description: 用户打开虚拟物品选项卡时将会选择的组。
+                      type: string
+                    selected_item:
+                      description: 用户打开虚拟物品选项卡时将会选择的物品。物品 SKU 应发送至此处。
+                      type: string
+                  type: object
+              type: object
+            desktop:
+              description: 带有对桌面版本有效的界面设置相关数据的对象。
+              properties:
+                header:
+                  description: 带有标题设置相关数据的对象。
+                  properties:
+                    close_button:
+                      description: 是否在支付中心桌面端显示关闭按钮。该按钮将关闭支付中心并将用户重定向到`settings.return_url`参数中指定的URL。默认为`false`。
+                      type: boolean
+                    is_visible:
+                      description: 标题在支付 UI 上是否可见。
+                      type: boolean
+                    type:
+                      description: 如何显示标题。不能为`compact`（隐藏项目名称和用户ID）或`normal`（默认）。
+                      enum:
+                      - compact
+                      - normal
+                      type: string
+                    visible_logo:
+                      description: 如果为`true`，标题中将显示Logo（请先把Logo文件提供给您的项目经理）。
+                      type: boolean
+                    visible_name:
+                      description: 标题中是否显示项目名称。
+                      type: boolean
+                    visible_purchase:
+                      description: 是否在标题中显示购买描述（`purchase.description.value`）。默认为`true`。
+                      type: boolean
+                  type: object
+                subscription_list:
+                  description: 带有订阅列表设置相关数据的对象。
+                  properties:
+                    description:
+                      description: 可以在此传递订阅相关的任意文本。文本将显示在订阅计划列表的上方。
+                      type: string
+                    display_local_price:
+                      description: 如为`true`且如果用户的当地货币与订阅计划的货币不同，则用户将看到两种价格：以当地货币和基础货币标价的价格。
+                      type: boolean
+                    layout:
+                      description: 订阅列表模式。可以是`list`（默认值）或`grid`。
+                      enum:
+                      - list
+                      - grid
+                      type: string
+                  type: object
+                virtual_currency_list:
+                  description: 带有虚拟货币列表设置相关数据的对象。
+                  properties:
+                    button_with_price:
+                      description: 如果为`true`，则价格会显示在按钮里。如果为`false`，则价格会显示在按钮左侧。默认值为`false`。
+                      type: boolean
+                    description:
+                      description: 可以在此传递虚拟货币列表相关的任意文本。文本将显示在虚拟货币包列表的上方。
+                      type: string
+                  type: object
+                virtual_item_list:
+                  description: 带有虚拟物品列表设置相关数据的对象。
+                  properties:
+                    button_with_price:
+                      description: 如果为`true`，则价格会显示在按钮里。如果为`false`，则价格会显示在按钮左侧。默认值为`false`。
+                      type: boolean
+                    layout:
+                      description: 订阅列表模式。可以是`list`（默认值）或`grid`。
+                      enum:
+                      - list
+                      - grid
+                      type: string
+                    view:
+                      description: 以垂直/水平菜单显示虚拟项目组。可以`horizontal_navigation`或`vertical_navigation`（默认）。
+                      enum:
+                      - horizontal_navigation
+                      - vertical_navigation
+                      type: string
+                  type: object
+              type: object
+            header:
+              properties:
+                visible_virtual_currency_balance:
+                  description: 此元素是否可在支付UI上隐藏。默认为`true`。
+                  type: boolean
+              type: object
+            is_prevent_external_link_open:
+              description: 是否禁用将链接重定向至外部资源。默认为`true`。点击外部链接时，将通过`postMessage`机制发送`external-link-open`事件。重定向链接的地址在`url`参数中传递。
+              type: boolean
+            license_url:
+              description: EULA的链接。
+              type: string
+            mobile:
+              properties:
+                footer:
+                  properties:
+                    is_visible:
+                      description: 是否在移动版本的支付UI中隐藏或显示脚注。
+                      type: boolean
+                  type: object
+                header:
+                  properties:
+                    close_button:
+                      description: 是否在支付中心移动端显示关闭按钮。该按钮将关闭支付中心并将用户重定向到`settings.return_url`参数中指定的URL。默认为`false`。
+                      type: boolean
+                  type: object
+                mode:
+                  description: 用户仅可以通过他们已保存的付款方式进行付款。可以为`saved_accounts`。
+                  enum:
+                  - saved_accounts
+                  type: string
+              type: object
+            mode:
+              description: 用户帐户中的支付界面。可能的值为`user_account`。请注意，标头仅包含用户帐户的导航菜单，而没有用于选择产品或进行付款的任何选项。
+              type: string
+            size:
+              description: |-
+                支付UI的大小。此参数可拥有以下值之一，具体取决于支付UI的所需大小：
+                  - [small](https://livedemo.xsolla.com/developers/small/)：支付UI支持的最小尺寸。当窗口大小严格受限时，请使用此值（尺寸：620 x 630）
+                  - [medium](https://livedemo.xsolla.com/developers/medium/)：支付UI的推荐大小。使用此值可以在灯箱中显示支付UI（尺寸：740 x 760）
+                  - [large](https://livedemo.xsolla.com/developers/large/)：在新窗口或者选项卡中显示支付UI的最佳大小（尺寸：820 x 840）
+              enum:
+              - small
+              - medium
+              - large
+              type: string
+            theme:
+              description: 支付UI的外观主题。可以是`default`（默认值）或`default_dark`。
+              enum:
+              - default
+              - default_dark
+              type: string
+            user_account:
+              description: 对象以及有关用户账号的数据。
+              properties:
+                history:
+                  description: '**历史记录**子菜单。'
+                  properties:
+                    enable:
+                      description: 在菜单中显示还是隐藏“管理订阅”页面。默认值为`false`。
+                      type: boolean
+                    order:
+                      description: 虚拟物品在模块菜单中的排列顺序。
+                      type: integer
+                  type: object
+                info:
+                  description: '**我的账户**页面。'
+                  properties:
+                    enable:
+                      description: 在菜单中显示还是隐藏“管理订阅”页面。默认值为`false`。
+                      type: boolean
+                    order:
+                      description: 虚拟物品在模块菜单中的排列顺序。
+                      type: integer
+                  type: object
+                payment_accounts:
+                  description: '**保存的付款方法**子菜单。'
+                  properties:
+                    enable:
+                      description: 在菜单中显示还是隐藏“管理订阅”页面。默认值为`false`。
+                      type: boolean
+                    order:
+                      description: 虚拟物品在模块菜单中的排列顺序。
+                      type: integer
+                  type: object
+                subscriptions:
+                  description: '**管理订阅**子菜单。'
+                  properties:
+                    enable:
+                      description: 在菜单中显示还是隐藏“管理订阅”页面。默认值为`false`。
+                      type: boolean
+                    order:
+                      description: 虚拟物品在模块菜单中的排列顺序。
+                      type: integer
+                  type: object
+              type: object
+            version:
+              description: 设备的类型。可以是`desktop`（默认值）或`mobile`。
+              enum:
+              - desktop
+              - mobile
+              type: string
+          type: object
+      required:
+      - project_id
+      type: object
+    Settings_body:
+      description: 带有购买设置相关数据的对象。
+      properties:
+        mode:
+          description: 设置`sandbox`值以测试支付流程。对于真实支付，应移除此参数。
+          type: string
+      type: object
+    User:
+      description: 带用户相关数据的对象。
+      properties:
+        age:
+          description: 用户年龄。
+          type: integer
+        attributes:
+          description: 带有用户属性相关数据的对象，用于筛选物品列表。应当是带键值对的有效JSON哈希。
+          type: object
+        country:
+          properties:
+            allow_modify:
+              description: 用户是否可以更改支付UI上的国家/地区。默认值为`false`。
+              type: boolean
+            value:
+              description: 使用[ISO 3166-1 alpha-2标准](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)规定的2字母组合表示国家/地区。
+              type: string
+          type: object
+        email:
+          description: '`user.email`对象是反欺诈模型的必要部分，有助于提高接受率。同时它也是艾克索拉和支付系统的要求。如果未传入该参数，支付页面将显示输入邮箱必填字段。购买凭证将发送至在该参数中传入的或在支付页面上输入的邮箱地址。'
+          properties:
+            value:
+              description: 用户电子邮箱。必须符合[RFC 822](https://www.w3.org/Protocols/rfc822/#z8)协议标准。
+              type: string
+          required:
+          - value
+          type: object
+        id:
+          properties:
+            value:
+              description: 用户ID。
+              type: string
+          required:
+          - value
+          type: object
+        is_legal:
+          description: 用户是否为法律实体。
+          type: boolean
+        legal:
+          description: 包含法律实体详细信息的对象。如果`user.is_legal`为`true`，则对象及其所有参数为必需。
+          properties:
+            address:
+              description: 完整法定地址。
+              type: string
+            country:
+              description: 公司所在国家/地区。参照[ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)标准的两个大写字母表示的国家/地区代码。
+              type: string
+            name:
+              description: 完整法定名称。
+              type: string
+            vat_id:
+              description: 个人纳税人识别号。
+              type: string
+          type: object
+        name:
+          properties:
+            value:
+              description: 用户昵称。
+              type: string
+          type: object
+        phone:
+          properties:
+            value:
+              description: 电话号码。
+              type: string
+          type: object
+        public_id:
+          properties:
+            value:
+              description: 唯一识别用户并为用户所熟知的参数，与用户ID（电子邮件、昵称等）不同。此参数在可以在游戏商店以外进行购买时使用（如现金售货亭中的游戏按键）。
+              type: string
+          type: object
+        steam_id:
+          properties:
+            value:
+              description: Steam ID。
+              type: string
+          type: object
+        tracking_id:
+          properties:
+            value:
+              description: 唯一的跟踪ID（用于营销活动）。
+              type: string
+          type: object
+        utm:
+          description: 对象包含描述流量特性的数据。
+          properties:
+            utm_campaign:
+              description: 活动标题。该参数应当包含直译的活动标题或者翻译为英文的活动标题。
+              type: string
+            utm_content:
+              description: 该活动的实质。
+              type: string
+            utm_medium:
+              description: 流量渠道（内容关联广告、媒体广告、邮件列表消息）。
+              type: string
+            utm_source:
+              description: 流量来源。
+              type: string
+            utm_term:
+              description: 活动关键词。在指定该参数的情况下，统计数据是基于在确定您的广告活动的目标对象过程中所使用的关键词数据而生成的，而不是基于检索项数据。在Google
+                Analytics中，`utm_term`标签的内容成为包含检索项的综合报告中的一部分。
+              type: string
+          type: object
+      required:
+      - id
+      - email
+      type: object
+    User_body:
+      description: 带用户相关数据的对象。
+      properties:
+        ip:
+          description: 用户IP。
+          type: string
+        legal:
+          description: 包含法律实体详细信息的对象。
+          properties:
+            address:
+              description: 完整法定地址。
+              type: string
+            country:
+              description: 公司所在国家/地区。参照[ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)标准的两个大写字母表示的国家/地区代码。
+              type: string
+            legal:
+              description: 完整法定名称。
+              type: string
+            vat_id:
+              description: 个人纳税人识别号。
+              type: string
+          type: object
+        name:
+          description: 用户名。
+          type: string
+      required:
+      - ip
+      type: object
+  securitySchemes:
+    basicAuth:
+      description: |-
+        艾克索拉API使用基本认证。所有发送到API的请求必须包含`Authorization: Basic <your_authorization_basic_key>`头，其中`your_authorization_basic_key`是根据Base64标准加密的`merchant_id:api_key`对。
+
+        请前往[艾克索拉发布商帐户](https://publisher.xsolla.com/) > 公司设置，然后在“公司”选项卡中找到<ul><li> `merchant_id`，</li><li>并在API密钥选项卡中找到`api_key`。</li></ul><br>
+      scheme: basic
+      type: http
+info:
+  description: ''
+  title: Pay Station API
+  version: '2.0'
+openapi: 3.0.0
+paths:
+  /merchants/{merchant_id}/reports:
+    get:
+      description: 获取指定数据范围的财务报告列表。
+      operationId: get-reports
+      parameters:
+      - $ref: '#/components/parameters/merchant-id-path-param'
+      - $ref: '#/components/parameters/datetime-from-req'
+      - $ref: '#/components/parameters/datetime-to-req'
       responses:
-        "200":
-          description: "OK"
-          schema:
-            $ref: "#/definitions/charge"
+        '200':
+          content:
+            application/json:
+              example:
+              - agreement_document_id: Organization Inc_RUB
+                currency: RUB
+                is_direct_payout: false
+                is_draft_by_agreement: true
+                month: January
+                report_id: 57613
+                year: 2019
+              - agreement_document_id: Organization Inc_EUR
+                currency: USD
+                is_direct_payout: false
+                is_draft_by_agreement: true
+                month: January
+                report_id: 57619
+                year: 2019
+          description: OK.
       security:
-      - api_key: []
-securityDefinitions:
-  petstore_auth:
-    type: "oauth2"
-    authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
-    flow: "implicit"
-    scopes:
-      write:pets: "modify pets in your account"
-      read:pets: "read your pets"
-  api_key:
-    type: "apiKey"
-    name: "api_key"
-    in: "header"
-definitions:
-  account:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-        example: 4612345
-      name:
-        type: "string"
-        example: "PP_saved_account"
-      payment_system:
-        type: "object"
-        properties:
-          id:
-            type: "integer"
-            format: "int64"
-            example: "24"
-          name:
-            type: "string"
-            example: "PayPal"
-      type:
-        type: "string"
-        example: "paypal"
-  charge:
-    type: "object"
-    properties:
-      id:
-        type: "string"
-        example: "ch_1HFWCi2eZvKYlo2CKud5k7FU"
-      amount:
-        type: "number"
-        format: "float"
-        example: "2000"
-      billing_details:
-        type: "object"
-        properties:
-          address:
-            type: "object"
-            properties:
-              city:
-                type: "string"
-                example: "Perm"
-              country:
-                type: "string"
-                example: "Russia"
-      description:
-        type: "string"
-        example: "My First Test Charge (created for API docs)"
-      paid:
-        type: "boolean"
-        example: true
-  dog_breed:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-        description: "Dog's breed ID in the store."
-      name:
-        type: "string"
-        description: "Name of the dog's breed."
-        example: 123
-  pet:
-    type: "object"
-    required:
-    - "id"
-    - "name"
-    - "dog_breed"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-        description: "Pet ID in the store."
-        example: 123
-      name:
-        type: "string"
-        description: "Pet name."
-        example: "Bobik"
-      dog_breed:
-        $ref: "#/definitions/dog_breed"
-      status:
-        type: "string"
-        description: "Pet status in the store."
-        enum:
-        - "available"
-        - "pending"
-        - "sold"
-        example: "available"
-  api_error:
-    type: "object"
-    description: "Error"
-    required:
-      - "code"
-      - "description"
-    properties:
-      code:
-        description: "Error code."
-        type: "string"
-      description:
-        description: "Error description."
-        type: "string"
+      - basicAuth: []
+      summary: 列示所有报告
+      tags:
+      - Reports
+  /merchants/{merchant_id}/reports/transactions/registry.{format}:
+    get:
+      description: |-
+        以不同数据格式获取指定数据范围/传输/报告的所有交易的信息。将在API的响应中返回JSON、CSV或XLS。
+
+        <div class='note'><b>Note</b><br><br>此API方法在高负载状态下不可用。请求数量过多的情况下可能会限流。如需了解此API方法的流量控制详情，请联系您的帐户经理。</div>
+      operationId: get-transactions
+      parameters:
+      - $ref: '#/components/parameters/merchant-id-path-param'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/datetime-from-req'
+      - $ref: '#/components/parameters/datetime-to-req'
+      - $ref: '#/components/parameters/in-transfer-currency'
+      - $ref: '#/components/parameters/show-total'
+      - $ref: '#/components/parameters/merchant-of-records'
+      - $ref: '#/components/parameters/project-id-query-param'
+      - $ref: '#/components/parameters/show-dry-run'
+      - $ref: '#/components/parameters/transfer-id'
+      - $ref: '#/components/parameters/report-id'
+      - $ref: '#/components/parameters/offset'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/transaction-status'
+      responses:
+        '200':
+          content:
+            application/json:
+              example:
+              - payment_details:
+                  chargebackPenalty:
+                    amount: 0
+                  commission_agent:
+                    amount: 0
+                    percent: 0
+                  commission_agent_fixed: 0
+                  commission_ps:
+                    amount: 0
+                    fixed_amount: 0
+                    percent: 0
+                  commission_ps_from_vat:
+                    amount: 0
+                  commission_user:
+                    amount: 0.01
+                    percent: 33.33
+                  commission_xsolla:
+                    amount: 0
+                    fixed_amount: 0
+                    percent: 5
+                  cpa_network_commission:
+                    amount: 0
+                    percent: 0
+                  direct_wht:
+                    amount: 0
+                    percent: 0
+                  payment:
+                    amount: 0.03
+                    amount_from_ps: 0
+                    currency: USD
+                  payout:
+                    amount: 0.02
+                    amount_from_ps: 0
+                    currency: RUB
+                    fx_rate: 64.1386407767
+                    percent: 100
+                  refundPenalty:
+                    amount: 0
+                  repatriation_costs:
+                    amount: 0
+                    percent: 0
+                  sales_tax:
+                    amount: 0
+                    percent: 0
+                  vat:
+                    amount: 0
+                    percent: 0
+                    user_amount: 0
+                    user_percent: 0
+                purchase:
+                  friend:
+                    email: ~
+                    user_id: ~
+                  items_amount: 1
+                  pin_codes:
+                    amount: ~
+                    content: ~
+                    currency: ~
+                  purchase_amount: 0.02
+                  simple_checkout:
+                    amount: ~
+                    currency: ~
+                  subscription:
+                    name: ~
+                    plan_id: ~
+                    subscription_id: ~
+                  virtual_currency:
+                    amount: 0.02
+                    currency: USD
+                  virtual_currency_amount: 1
+                  virtual_items:
+                    amount: ~
+                    content: ~
+                    currency: ~
+                transaction:
+                  custom_parameters: ~
+                  direct_account: 0
+                  dry_run: 0
+                  external_id: ~
+                  id: 418756634
+                  payment_method:
+                    class: Digital Payment Methods
+                    id: 2760
+                    name: Your Balance
+                  project:
+                    id: 21092
+                    name: Smith
+                  refund_reason: ~
+                  refund_reason_comment: ~
+                  status: done
+                  transfer_date: 2019-02-11T13:32:00+03:00
+                user:
+                  country: US
+                  custom: ~
+                  email: t.lucky@transaction.com
+                  id: a.smith
+                  ip: 209.11.22.33
+                  marketplace: Pay Station
+                  name: Tom
+                  phone: ~
+                user_balance:
+                  payment_currency:
+                    deduction_amount: 0
+                    payout_amount_from_balance: 0.02
+                    purchase_amount_from_balance: 0.02
+          description: OK.
+      security:
+      - basicAuth: []
+      summary: 列示所有操作
+      tags:
+      - Reports
+  /merchants/{merchant_id}/reports/transactions/search.{format}:
+    get:
+      description: 基于特定搜索参数获取交易列表。将在API的响应中返回JSON、CSV或XLS。
+      operationId: find-transactions
+      parameters:
+      - $ref: '#/components/parameters/merchant-id-path-param'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/datetime-from'
+      - $ref: '#/components/parameters/datetime-to'
+      - $ref: '#/components/parameters/project-id-query-param'
+      - $ref: '#/components/parameters/show-dry-run'
+      - $ref: '#/components/parameters/transaction-id'
+      - $ref: '#/components/parameters/phone'
+      - $ref: '#/components/parameters/user-id-query-param'
+      - $ref: '#/components/parameters/user-name'
+      - $ref: '#/components/parameters/user-custom'
+      - $ref: '#/components/parameters/email'
+      - $ref: '#/components/parameters/external-id'
+      - $ref: '#/components/parameters/offset'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/transaction-type'
+      - $ref: '#/components/parameters/status'
+      responses:
+        '200':
+          content:
+            application/json:
+              example:
+              - payment_details:
+                  payment:
+                    amount: 86.68
+                    amount_from_ps: 86.68
+                    currency: RUB
+                  sales_tax:
+                    amount: 0
+                    percent: 0
+                purchase:
+                  pin_codes:
+                    amount: ~
+                    content: ~
+                    currency: ~
+                  simple_checkout:
+                    amount: 0
+                    currency: RUB
+                  subscription:
+                    name: ~
+                  virtual_currency:
+                    amount: 0
+                    name: Maple
+                  virtual_items: Duck
+                transaction:
+                  dry_run: 2
+                  external_id: ~
+                  id: 141819657
+                  is_refund_allowed: 1
+                  payment_method:
+                    id: 98
+                    name: PayPal
+                  project:
+                    id: 89753
+                    name: Farm II Project
+                  refund_reason: Test payment
+                  status: canceled
+                  transfer_date: 2019-02-08T13:14:08+03:00
+                user:
+                  country: RU
+                  custom: ~
+                  email: j.johns@transaction.com
+                  id: j.johns
+                  name: j.johns
+                  phone: ~
+          description: OK.
+      security:
+      - basicAuth: []
+      summary: 搜索所有交易
+      tags:
+      - Reports
+  /merchants/{merchant_id}/reports/transactions/summary/transfer:
+    get:
+      description: |-
+        按货币获取出款细目。
+
+        <div class='note'><b>Note</b><br><br>此API方法在高负载状态下不可用。请求数量过多的情况下可能会限流。如需了解此API方法的流量控制详情，请联系您的帐户经理。</div>
+      operationId: get-payouts
+      parameters:
+      - $ref: '#/components/parameters/merchant-id-path-param'
+      - $ref: '#/components/parameters/datetime-from'
+      - $ref: '#/components/parameters/datetime-to'
+      - $ref: '#/components/parameters/legal-entity-id'
+      - $ref: '#/components/parameters/transaction-status'
+      responses:
+        '200':
+          content:
+            application/json:
+              example:
+              - DirectTaxesOfPayments: 0.46
+                IsoCurrency: RUB
+                PaymentsAmount: 223679.84
+                SumCommissionAgent: 11329.58
+                SumCommissionUserTaxes: 153.67
+                SumItems: 571325.13
+                SumNominalSum: 214792.98
+                SumOutProject: 551096.13
+                SumPayoutSum: 193316.71
+                TaxesOfPayments: 171.56
+              - DirectTaxesOfPayments: 0.14
+                IsoCurrency: USD
+                PaymentsAmount: 482.58
+                SumCommissionAgent: 77.51
+                SumCommissionUserTaxes: 0.07
+                SumItems: 243777.62
+                SumNominalSum: 493.09
+                SumOutProject: 241787.62
+                SumPayoutSum: 462.62
+                TaxesOfPayments: 0.14
+              - DirectTaxesOfPayments: 0.07
+                IsoCurrency: EUR
+                PaymentsAmount: 608.2
+                SumCommissionAgent: 55.71
+                SumCommissionUserTaxes: 90.94
+                SumItems: 156238.62
+                SumNominalSum: 607.26
+                SumOutProject: 156158.62
+                SumPayoutSum: 460.8
+                TaxesOfPayments: 90.94
+          description: OK.
+      security:
+      - basicAuth: []
+      summary: 列示所有汇款
+      tags:
+      - Reports
+  /merchants/{merchant_id}/reports/transactions/{transaction_id}/details:
+    get:
+      description: 按ID获取完整交易信息。
+      operationId: get-transaction
+      parameters:
+      - $ref: '#/components/parameters/merchant-id-path-param'
+      - $ref: '#/components/parameters/transaction-id-path-param'
+      responses:
+        '200':
+          content:
+            application/json:
+              example:
+                customer_details:
+                  billing_address: ''
+                  bin: ''
+                  browser_language: ''
+                  country: US
+                  ip: 209.11.22.33
+                  paystation_country: ''
+                  phone: ~
+                  timezone: ''
+                  user_id: user1
+                  user_name: John Smith
+                finance_details:
+                  direct_wht:
+                    amount: '0'
+                    currency: USD
+                  payment:
+                    amount: '0.04'
+                    currency: USD
+                  payment_method_fee:
+                    amount: '0.01'
+                    currency: USD
+                  payment_method_sum:
+                    amount: '0.04'
+                    currency: USD
+                  payout:
+                    amount: '1.25'
+                    currency: RUB
+                  payout_currency_rate: '62.4080582524'
+                  repatriation_commission:
+                    amount: '0'
+                    currency: USD
+                  sales_tax:
+                    amount: '0'
+                    currency: USD
+                  vat:
+                    amount: '0.01'
+                    currency: USD
+                  xsolla_balance_sum:
+                    amount: '0'
+                    currency: USD
+                  xsolla_fee:
+                    amount: '0'
+                    currency: USD
+                payment_details:
+                  card_holdername: ~
+                  card_issuer: AWESOME BANK
+                  card_month: '01'
+                  card_number: '6759649826438453'
+                  card_scheme: MASTERCARD
+                  card_year: '2020'
+                  customer_firstname: ''
+                  customer_lastname: ''
+                  enrollment: false
+                  ps_account: 8c12345ef8ce398b98b655b68
+                  zip_code: ''
+                subscription_details:
+                  is_payment_from_subscription: false
+                  is_subscription_created: true
+                transaction_details:
+                  amount: '0.04'
+                  cancellation_date: ~
+                  country: US
+                  currency: USD
+                  custom_parameters: ~
+                  foreign_invoice: ~
+                  gift_recipient_email: ~
+                  gift_recipient_id: ~
+                  payment_date: 2019-03-21 16:15:37
+                  payment_method: '1380'
+                  payment_method_name: Credit/Debit Cards
+                  project: '21092'
+                  project_name: Farm Fresh
+                  purchase:
+                    checkout:
+                      amount: '0'
+                      currency: USD
+                    pin_codes:
+                      amount: '0'
+                      content: ~
+                      currency: ~
+                    total:
+                      amount: '0.03'
+                      currency: USD
+                    virtual_currency:
+                      amount: '0.03'
+                      currency: USD
+                      name: Gold coins
+                      quantity: '2'
+                    virtual_items: ~
+                  refund_comment: ~
+                  refund_reason: ~
+                  status: done
+                  user_id: user1
+          description: OK.
+      security:
+      - basicAuth: []
+      summary: 获取交易
+      tags:
+      - Reports
+  /merchants/{merchant_id}/reports/transactions/{transaction_id}/partial_refund:
+    put:
+      description: 发送部分退款请求向用户退还部分付款。请注意，部分退款仅适用于使用信用卡和PayPal付款。要了解详细过程，请参阅[退款功能](https://developers.xsolla.com/doc/pay-station/features/refund/)。
+      operationId: request-partial-refund
+      parameters:
+      - $ref: '#/components/parameters/merchant-id-path-param'
+      - $ref: '#/components/parameters/transaction-id-path-param'
+      requestBody:
+        content:
+          application/json:
+            example:
+              description: test refund request
+              refund_amount: '1.50'
+            schema:
+              properties:
+                description:
+                  description: 退款原因。
+                  type: string
+                refund_amount:
+                  description: 以购买货币表示的退款金额。
+                  format: float
+                  type: integer
+              required:
+              - description
+              - refund_amount
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              example:
+                message: The request for a refund has been accepted. Xsolla CS will
+                  automatically send the customer an email with alternative refund
+                  options as the user's method does not support direct refunds.
+              schema:
+                properties:
+                  message:
+                    description: |-
+                      可能返回以下两条消息之一：
+                      - The request for a refund has been accepted. Xsolla CS will manually complete the refund. It may take up to two business days.
+                      - The request for a refund has been accepted. Xsolla CS will automatically send the customer an email with alternative refund options as the user's method does not support direct refunds.
+                    type: string
+                type: object
+          description: OK.
+        '204':
+          description: No content.
+        '401':
+          description: Unauthorized.
+        '404':
+          content:
+            application/json:
+              example:
+                message: Transaction ID not valid. Please check payment credentials.
+                  Otherwise, contact Xsolla support at support@xsolla.com.
+              schema:
+                properties:
+                  message:
+                    description: 交易ID无效。请检查支付凭据。否则请发送邮件至support@xsolla.com与艾克索拉支持人员联系。
+                    type: string
+                type: object
+          description: 未找到交易。
+        '422':
+          content:
+            application/json:
+              example:
+                message: We are processing the refund request. This may take up to
+                  two business days.
+              schema:
+                properties:
+                  message:
+                    description: |-
+                      可能返回以下消息之一：
+                      - We are processing the refund request. This may take up to two business days.
+                      - We are reaching the user for the information required for the refund. For details, contact Xsolla Support.
+                      - Incorrect payment status. Refund is possible only for payments with "completed" or "error" status.
+                      - To process this request, the customer's email address field must be filled. Please specify the customer's email address and try again.
+                      - Full refund is unavailable because there are successful partial refunds for this transaction.
+                      - Refund failed. Please contact Xsolla Support to process it manually.
+                    type: string
+                type: object
+          description: Unprocessable Entity.
+      security:
+      - basicAuth: []
+      summary: 部分退款
+      tags:
+      - Refund
+  /merchants/{merchant_id}/reports/transactions/{transaction_id}/refund:
+    put:
+      description: |-
+        发送向用户退款的请求。请阅读[退款功能](https://developers.xsolla.com/doc/pay-station/features/refund/)了解详细过程。
+
+        <div class='note'><b>Note</b><br><br>此API方法在高负载状态下不可用。请求数量过多的情况下可能会限流。如需了解此API方法的流量控制详情，请联系您的帐户经理。</div>
+      operationId: request-refund
+      parameters:
+      - $ref: '#/components/parameters/merchant-id-path-param'
+      - $ref: '#/components/parameters/transaction-id-path-param'
+      requestBody:
+        content:
+          application/json:
+            example:
+              description: test refund request
+            schema:
+              properties:
+                description:
+                  description: 退款原因。
+                  type: string
+                email:
+                  description: 用户电子邮件。
+                  type: string
+              required:
+              - description
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              example:
+                message: The request for a refund has been accepted. Xsolla CS will
+                  automatically send the customer an email with alternative refund
+                  options as the user's method does not support direct refunds.
+              schema:
+                properties:
+                  message:
+                    description: |-
+                      可能返回以下两条消息之一：
+                      - The request for a refund has been accepted. Xsolla CS will manually complete the refund. It may take up to two business days.
+                      - The request for a refund has been accepted. Xsolla CS will automatically send the customer an email with alternative refund options as the user's method does not support direct refunds.
+                    type: string
+                type: object
+          description: OK.
+        '204':
+          description: No content.
+        '401':
+          description: Unauthorized.
+        '404':
+          content:
+            application/json:
+              example:
+                message: Transaction ID not valid. Please check payment credentials.
+                  Otherwise, contact Xsolla support at support@xsolla.com.
+              schema:
+                properties:
+                  message:
+                    description: 交易ID无效。请检查支付凭据。否则请发送邮件至support@xsolla.com与艾克索拉支持人员联系。
+                    type: string
+                type: object
+          description: 未找到交易。
+        '422':
+          content:
+            application/json:
+              example:
+                message: We are processing the refund request. This may take up to
+                  two business days.
+              schema:
+                properties:
+                  message:
+                    description: |-
+                      可能返回以下消息之一：
+                      - We are processing the refund request. This may take up to two business days.
+                      - We are reaching the user for the information required for the refund. For details, contact Xsolla Support.
+                      - Incorrect payment status. Refund is possible only for payments with "completed" or "error" status.
+                      - To process this request, the customer's email address field must be filled. Please specify the customer's email address and try again.
+                      - Full refund is unavailable because there are successful partial refunds for this transaction.
+                      - Refund failed. Please contact Xsolla Support to process it manually.
+                    type: string
+                type: object
+          description: Unprocessable Entity.
+      security:
+      - basicAuth: []
+      summary: 请求退款
+      tags:
+      - Refund
+  /merchants/{merchant_id}/token:
+    post:
+      description: |-
+        您可以使用任意用户参数创建令牌。您可以在获取令牌时发送这些参数，支付成功后将返回这些参数。令牌只能包含本文档中描述的参数或合作伙伴预定义的参数。
+
+        如果发送的参数格式或类型不正确，将不会提供令牌。您将收到一个**422** HTTP代码以及放在JSON正文中的错误描述。在`extended_message`中，将向您提供具体是哪些参数不正确。
+
+        <div class='note'><b>Note</b><br><br>此API方法在高负载状态下不可用。请求数量过多的情况下可能会限流。如需了解此API方法的流量控制详情，请联系您的帐户经理。</div>
+      operationId: create-token
+      parameters:
+      - $ref: '#/components/parameters/merchant-id-path-param'
+      requestBody:
+        content:
+          application/json:
+            example:
+              purchase:
+                virtual_currency:
+                  quantity: 100
+                virtual_items:
+                  items:
+                  - amount: 1
+                    sku: SKU01
+              settings:
+                currency: USD
+                language: en
+                project_id: 16184
+                ui:
+                  components:
+                    virtual_currency:
+                      custom_amount: true
+                  desktop:
+                    virtual_item_list:
+                      button_with_price: true
+                      layout: list
+                  size: medium
+              user:
+                age: 19
+                country:
+                  allow_modify: true
+                  value: US
+                email:
+                  value: john.smith@mail.com
+                id:
+                  value: user_2
+                name:
+                  value: John Smith
+            schema:
+              properties:
+                custom_parameters:
+                  $ref: '#/components/schemas/CustomParameters'
+                purchase:
+                  $ref: '#/components/schemas/Purchase'
+                settings:
+                  $ref: '#/components/schemas/Settings'
+                user:
+                  $ref: '#/components/schemas/User'
+              type: object
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              example:
+                token: eop57k1boA7nnYPtewZ6KEXJyJADEwRT
+              schema:
+                properties:
+                  token:
+                    type: string
+                type: object
+          description: Created.
+        '422':
+          content:
+            application/json:
+              example:
+                extended_message:
+                  global_errors: []
+                  property_errors:
+                    purchase.checkout.amount:
+                    - String value found, but a number is required
+                http_status_code: 422
+                message: JSON is not valid against json schema, please check documentation
+                  https://developers.xsolla.com/api/v2/getting-started/#api_token_ui
+                request_id: cd72633
+              schema:
+                properties:
+                  extended_message:
+                    properties:
+                      global_errors:
+                        items:
+                          type: string
+                        type: array
+                      property_errors:
+                        description: 对象包含参数名称和错误描述。
+                        type: object
+                    type: object
+                  http_status_code:
+                    type: integer
+                  message:
+                    type: string
+                  request_id:
+                    type: string
+                type: object
+          description: Unprocessable Entity.
+      security:
+      - basicAuth: []
+      summary: 创建令牌
+      tags:
+      - Token
+  /projects/{project_id}/users/{user_id}/payment_accounts:
+    get:
+      description: 列示已保存的用户支付帐户。
+      operationId: get-saved-accounts
+      parameters:
+      - $ref: '#/components/parameters/project-id-path-param'
+      - $ref: '#/components/parameters/user-id-path-param'
+      responses:
+        '200':
+          content:
+            application/json:
+              example:
+              - id: 4612345
+                name: PP_saved_account
+                payment_system:
+                  id: 24
+                  name: PayPal
+                type: paypal
+          description: OK.
+      security:
+      - basicAuth: []
+      summary: 列示已保存的支付帐户
+      tags:
+      - Tokenization
+  /projects/{project_id}/users/{user_id}/payment_accounts/{type}/{account_id}:
+    delete:
+      description: 删除已保存的支付帐户。
+      operationId: delete-saved-account
+      parameters:
+      - $ref: '#/components/parameters/project-id-path-param'
+      - $ref: '#/components/parameters/user-id-path-param'
+      - $ref: '#/components/parameters/type-path-param'
+      - $ref: '#/components/parameters/account-id-path-param'
+      responses:
+        '204':
+          description: No content.
+      security:
+      - basicAuth: []
+      summary: 删除已保存的支付帐户
+      tags:
+      - Tokenization
+  /projects/{project_id}/users/{user_id}/payments/{type}/{account_id}:
+    post:
+      description: |-
+        使用已保存的支付帐户收费。
+
+        <div class='note'><b>Note</b><br><br>此API方法在高负载状态下不可用。请求数量过多的情况下可能会限流。如需了解此API方法的流量控制详情，请联系您的帐户经理。</div>
+      operationId: charge-with-saved-account
+      parameters:
+      - $ref: '#/components/parameters/project-id-path-param'
+      - $ref: '#/components/parameters/user-id-path-param'
+      - $ref: '#/components/parameters/type-path-param'
+      - $ref: '#/components/parameters/account-id-path-param'
+      requestBody:
+        content:
+          application/json:
+            example:
+              card:
+                cvn: '123'
+              purchase:
+                description:
+                  value: currency purchase
+                virtual_currency:
+                  quantity: 100
+              settings:
+                currency: USD
+                external_id: ext123
+                save: true
+              user:
+                id: user123
+                ip: 111.11.11.11
+                legal:
+                  address: 17 Crown Street London SW2 0JW United Kingdom
+                  country: GB
+                  name: My Awesome Company
+                  vat_id: GB111111111
+                name: John Smith
+            schema:
+              properties:
+                custom_parameters:
+                  $ref: '#/components/schemas/CustomParameters'
+                purchase:
+                  $ref: '#/components/schemas/Purchase_body'
+                settings:
+                  $ref: '#/components/schemas/Settings_body'
+                user:
+                  $ref: '#/components/schemas/User_body'
+              type: object
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              example:
+                transaction_id: 123458390
+              schema:
+                properties:
+                  transaction_id:
+                    type: integer
+                type: object
+          description: Created.
+        '422':
+          description: Unprocessable Entity
+      security:
+      - basicAuth: []
+      summary: 通过已保存的帐户收费
+      tags:
+      - Tokenization
+servers:
+- url: https://api.xsolla.com/merchant/v2/
+tags:
+- description: 为使支付更加安全，艾克索拉API使用包含一系列支付参数的令牌，而不是通过HTTP GET请求直接在支付页面上接收数据。在调用支付页面之前，您应获取新的令牌。令牌的生命周期为24小时。
+  name: Token
+- description: 要了解为应用设置令牌化的详细信息，请参阅[支付中心文档](https://developers.xsolla.com/doc/pay-station/features/tokenization/)。
+  name: Tokenization
+- name: Reports
+- name: Refund
+x-stoplight:
+  docs:
+    showModels: false
